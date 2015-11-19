@@ -45,7 +45,7 @@ def get_uris(rssurl, name):
     soup = Soup(requests.get(rssurl).text, "lxml")
     for item in soup.findAll("item"):
         title = item.find("title").text
-        if not title in done:
+        if not title in done[name]:
             yield title, item.find("enclosure")["url"]
             done[name].append(title)
 

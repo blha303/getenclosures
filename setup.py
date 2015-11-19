@@ -10,7 +10,7 @@ setup(
     entry_points = {
         "console_scripts": ['getenclosures = getenclosures.getenclosures:main']
         },
-    version = "1.0.2",
+    version = "1.0.3",
     description = "Gets all enclosure urls from an RSS feed and pipes them to stdout",
     long_description = long_descr,
     author = "Steven Smith",
