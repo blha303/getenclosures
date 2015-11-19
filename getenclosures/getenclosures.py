@@ -26,18 +26,20 @@ mkdir(cachepath)
 mkdir(configpath)
 
 try:
-    with open(cachepath + "/done") as f:
-        done = [line.strip() for line in f.readlines()]
-except:
-    done = []
-
-try:
     with open(configpath + "/config.json") as f:
         names = json.load(f)
 except IOError:
     names = []
 
-def get_uris(rssurl):
+done = {}
+for name in names:
+    try:
+        with open(cachepath + "/" + name + "-done") as f:
+            done[name] = [line.strip() for line in f.readlines()]
+    except:
+        done[name] = []
+
+def get_uris(rssurl, name):
     """ Yields tuples: (torrent display name, uri) """
     global done
     soup = Soup(requests.get(rssurl).text, "lxml")
@@ -45,15 +47,16 @@ def get_uris(rssurl):
         title = item.find("title").text
         if not title in done:
             yield title, item.find("enclosure")["url"]
-            done.append(title)
+            done[name].append(title)
 
 def save_done():
     global done
     if not done:
         print("Not writing to cache file, no results", file=sys.stderr)
     else:
-        with open(cachepath + "/done", "w") as f:
-            f.write("\n".join(done))
+        for name in done:
+            with open(cachepath + "/" + name + "-done", "w") as f:
+                f.write("\n".join(done[name]))
 
 def main():
     global cachepath
@@ -62,6 +65,7 @@ def main():
     parser = argparse.ArgumentParser(prog="getenclosures")
     parser.add_argument("--config-dir", help="Set config directory. Defaults to " + configpath)
     parser.add_argument("--cache-dir", help="Set cache directory. Defaults to " + cachepath)
+    parser.add_argument("--show-names", help="Show titles before each URL")
     args = parser.parse_args()
     if args.config_dir:
         configpath = args.config_dir
@@ -73,9 +77,10 @@ def main():
             f.write(configexample)
         return 10
     for name,uri in names.items():
-        print("{}:".format(name), file=sys.stderr)
-        for title,uri in get_uris(uri):
-            print("    {}".format(title), file=sys.stderr)
+        print("\n{}:".format(name), file=sys.stderr)
+        for title,uri in get_uris(uri, name):
+            if args.show_names:
+                print("    {}".format(title), file=sys.stderr)
             print("{}".format(uri))
     save_done()
     return 0
