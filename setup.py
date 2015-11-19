@@ -6,11 +6,11 @@ with open("README.rst", "rb") as f:
 setup(
     name = "getenclosures",
     packages = ["getenclosures"],
-    install_requires = ['requests', 'beautifulsoup4', 'appdirs'],
+    install_requires = ['requests', 'beautifulsoup4', 'appdirs', 'lxml'],
     entry_points = {
         "console_scripts": ['getenclosures = getenclosures.getenclosures:main']
         },
-    version = "1.0.1",
+    version = "1.0.2",
     description = "Gets all enclosure urls from an RSS feed and pipes them to stdout",
     long_description = long_descr,
     author = "Steven Smith",
